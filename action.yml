@@ -20,6 +20,7 @@ runs:
       id: copy-script
       run: |
         cp -r script.js solution/script.js
+      shell: bash
     - name: Report invalid JS file to the LMS by rejecting submission.
       if: steps.copy-script.outcome != 'success'
       id: invalid-js-file
@@ -42,11 +43,13 @@ runs:
         cp -r $${{ inputs.level_name }}/script.test.js ./script.test.js
         npm install
         npm run test
+      shell: bash
     - name: Generate feedback from test results
       id: generate-feedback
       run: |
         cd solution
         node generateReportFromResults.js
+      shell: bash
     - name: Grade the submission based on test results
       if: steps.generate-feedback.outcome == 'success'
       uses: pupilfirst/grade-action@v1
