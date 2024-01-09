@@ -40,7 +40,7 @@ runs:
       id: run-test
       run: |
         cd solution
-        cp -r $${{ inputs.level_name }}/script.test.js ./script.test.js
+        cp -r ${{ inputs.level_name }}/script.test.js ./script.test.js
         npm install
         npm run test
       shell: bash
