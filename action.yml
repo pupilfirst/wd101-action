@@ -16,13 +16,24 @@ runs:
       with:
         repository: pupilfirst/wd101-tests
         path: solution
-    - name: Copy script.js to solution
-      id: copy-script
+
+    - name: Check for .js file and copy
       run: |
-        cp -r script.js solution/script.js
+        js_file=$(find . -maxdepth 1 -name "*.js" -print -quit)
+        if [ -n "$js_file" ]; then
+          echo "Valid JS file found: $js_file"
+          cp "$js_file" solution/script.js
+          echo "isValid=true" >> $GITHUB_ENV
+        else
+          echo "No JS file found"
+          echo "isValid=false" >> $GITHUB_ENV
+        fi
       shell: bash
+
+
+
     - name: Report invalid JS file to the LMS by rejecting submission.
-      if: steps.copy-script.outcome != 'success'
+      if: env.isValid != 'true'
       id: invalid-js-file
       uses: pupilfirst/grade-action@v1
       with:
@@ -35,7 +46,7 @@ runs:
 
           Give it another go!
     - name: Run tests in the solution repo
-      if: steps.copy-script.outcome == 'success'
+      if: env.isValid == 'true'
       continue-on-error: true
       id: run-test
       run: |
