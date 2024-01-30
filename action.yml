@@ -10,6 +10,14 @@ runs:
   using: "composite"
   steps:
     - uses: actions/checkout@v2
+
+    # Report to LMS tests are in progress
+    - name: Report to LMS that tests in progress
+      uses: pupilfirst/report-action@v1
+      with:
+        status: "in_progress"
+        description: "Automated tests are in progress."
+
     - name: Check out the solutions repo
       id: checkout-solutions-repo
       uses: actions/checkout@v2
@@ -29,8 +37,6 @@ runs:
           echo "isValid=false" >> $GITHUB_ENV
         fi
       shell: bash
-
-
 
     - name: Report invalid JS file to the LMS by rejecting submission.
       if: env.isValid != 'true'
@@ -64,5 +70,13 @@ runs:
     - name: Grade the submission based on test results
       if: steps.generate-feedback.outcome == 'success'
       uses: pupilfirst/grade-action@v1
+      with:
+        report_file_path: "solution/report.json"
+
+    # Report outcome of tests to the LMS
+    - name: Report outcome of tests to LMS
+      uses: pupilfirst/report-action@v1
+      if: steps.generate-feedback.outcome == 'success'
+      id: report-test-results
       with:
         report_file_path: "solution/report.json"
